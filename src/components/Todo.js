@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const todo = props => {
 const [todoName,setTodoName] = useState('');
+const [submittedTodo, setSubmittedTodo] = useState(null);
 const [todoList,setTodoList] = useState([]);
 
 //const [todoState, setTodoState] = useState({userInput:'', todoList:[]})
@@ -24,7 +25,7 @@ useEffect(() => {
         console.log('clean up');
     };
 
-},[todoName]);
+}, []);
 
 const mouseMoveHandler = event => {
     console.log(event.clientX,event.clientY);
@@ -34,8 +35,17 @@ useEffect(() => {
 document.addEventListener('mousemove',mouseMoveHandler);
 return() =>{
     document.removeEventListener('mousemove',mouseMoveHandler);
-    };    
-});
+    };  
+
+}, []);
+
+useEffect(() => {
+    if(submittedTodo){
+    setTodoList(todoList.concat(submittedTodo));
+    }
+},
+[submittedTodo]
+);   
 
 const inputchangehandler = event => {
     setTodoName(event.target.value);
@@ -45,7 +55,7 @@ const inputchangehandler = event => {
     // });
 };
 const nameChangeHandler = () => {
-    setTodoList(todoList.concat(todoName));
+   
 //    setTodoState({
 //     userInput : todoState.todoList,
 //     todoList: todoState.todoList.concat(todoState.userInput)
@@ -53,8 +63,12 @@ const nameChangeHandler = () => {
 
         axios.post('https://webpacks-4e54b.firebaseio.com/todo.json',{name:todoName})
         .then(res => { 
+            setTimeout(() =>{
             console.log(res);
-        })
+            const todoItem = {id:res.data.name, name:todoName};
+            setSubmittedTodo(todoItem);
+        }, 3000);
+    })
         .catch(err => {
             console.log(err);
         });
